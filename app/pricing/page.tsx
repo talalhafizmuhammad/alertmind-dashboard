@@ -91,7 +91,7 @@ export default function Pricing() {
                 <h2 className="text-xl font-bold mb-1">{plan.name}</h2>
                 <p className="text-gray-500 text-sm mb-4">{plan.description}</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold">\${plan.price}</span>
+                  <span className="text-4xl font-bold">${plan.price}</span>
                   <span className="text-gray-500">/mo</span>
                 </div>
               </div>
