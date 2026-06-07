@@ -105,7 +105,7 @@ export default function Dashboard() {
             <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Live</span>
           </div>
           <a href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors mr-4">Pricing</a>
-          <UserButton afterSignOutUrl="/sign-in" />
+          <UserButton  />
           <button
             onClick={fetchAlerts}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
