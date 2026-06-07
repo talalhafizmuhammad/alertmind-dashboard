@@ -60,7 +60,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Slack message demo */}
+      {/* Slack Demo */}
       <section className="max-w-3xl mx-auto px-6 pb-20">
         <div className="bg-[#1a1d21] rounded-2xl p-6 border border-white/5">
           <div className="flex items-center gap-2 mb-4">
@@ -74,7 +74,9 @@ export default function Landing() {
             <p className="font-bold text-red-400 mb-1">🚨 P1 Alert — api-service (prod)</p>
             <p className="text-gray-300 text-sm mb-3">CPU hit 94% at 3:44 AM</p>
             <p className="text-gray-400 text-sm mb-1"><span className="text-white font-medium">Most likely cause:</span></p>
-            <p className="text-gray-300 text-sm mb-3">Commit <code className="bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded">57040e2</code> by <strong>Talal</strong> removed a DB index on orders.user_id causing full table scans.</p>
+            <p className="text-gray-300 text-sm mb-3">
+              Commit <code className="bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded">57040e2</code> by <strong>Talal</strong> removed a DB index on orders.user_id causing full table scans.
+            </p>
             <p className="text-gray-400 text-sm mb-1"><span className="text-white font-medium">Suggested fix:</span></p>
             <code className="block bg-black/40 text-emerald-400 text-sm p-3 rounded-lg mb-4">
               Revert deploy #247 and re-add the missing index on orders.user_id
@@ -134,7 +136,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Tech stack */}
+      {/* Tech Stack */}
       <section className="max-w-6xl mx-auto px-6 pb-20">
         <h2 className="text-3xl font-bold text-center mb-4">Built with modern stack</h2>
         <p className="text-gray-400 text-center mb-10">Production-grade infrastructure from day one</p>
