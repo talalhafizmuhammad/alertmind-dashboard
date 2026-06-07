@@ -52,7 +52,7 @@ export default function Landing() {
             Open Dashboard <ChevronRight size={16} />
           </button>
           
-            href="/pricing"
+           <a href="/pricing"
             className="flex items-center gap-2 bg-white/5 border border-white/10 text-white font-medium px-6 py-3 rounded-xl hover:bg-white/10 transition-colors"
           >
             View Pricing
@@ -183,7 +183,7 @@ export default function Landing() {
           <div className="flex gap-6 text-sm text-gray-500">
             <a href="/pricing" className="hover:text-white transition-colors">Pricing</a>
             <a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a>
-            <a href="https://github.com/talalhafizmuhammad/alertmind-backend" target="_blank" className="hover:text-white transition-colors">GitHub</a>
+            <a href="https://github.com/talalhafizmuhammad/alertmind-backend" target="_blank" rel="noreferrer" className="hover:text-white transition-colors">GitHub</a>
           </div>
         </div>
       </footer>
