@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search, Zap } from 'lucide-react'
-import { UserButton } from '@clerk/nextjs'
+import { UserButton, useUser } from '@clerk/nextjs'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -29,6 +29,7 @@ interface Alert {
 }
 
 export default function Dashboard() {
+  const { user } = useUser()
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [filtered, setFiltered] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
