@@ -106,7 +106,13 @@ export default function Dashboard() {
             <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Live</span>
           </div>
           <a href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors mr-4">Pricing</a>
-          <UserButton  />
+          <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 cursor-pointer">
+              <UserButton />
+              <div>
+                <p className="text-xs font-medium text-white leading-none">{user?.firstName || user?.emailAddresses[0]?.emailAddress?.split('@')[0]}</p>
+                <p className="text-xs text-gray-500 leading-none mt-0.5">Click to manage</p>
+              </div>
+            </div>
           <button
             onClick={fetchAlerts}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
