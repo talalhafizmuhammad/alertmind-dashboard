@@ -1,248 +1,190 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
-import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search, Zap } from 'lucide-react'
-import { UserButton, useUser } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
+import { Zap, GitCommit, Bell, BarChart3, Shield, Clock, ChevronRight, Check } from 'lucide-react'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
-
-interface Alert {
-  id: string
-  service: string
-  severity: string
-  metric: string
-  value: string
-  alert_time: string
-  most_likely_cause: string
-  confidence: string
-  suggested_fix: string
-  severity_label: string
-  deploy_correlated: boolean
-  deployer: string
-  guilty_commit: string
-  guilty_author: string
-  created_at: string
-}
-
-export default function Dashboard() {
-  const { user } = useUser()
-  const [alerts, setAlerts] = useState<Alert[]>([])
-  const [filtered, setFiltered] = useState<Alert[]>([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState('')
-  const [severityFilter, setSeverityFilter] = useState('ALL')
-  const [refreshing, setRefreshing] = useState(false)
-
-  useEffect(() => {
-    fetchAlerts()
-    const interval = setInterval(fetchAlerts, 30000)
-    return () => clearInterval(interval)
-  }, [])
-
-  useEffect(() => {
-    let result = alerts
-    if (search) {
-      result = result.filter(a =>
-        a.service.toLowerCase().includes(search.toLowerCase()) ||
-        a.most_likely_cause?.toLowerCase().includes(search.toLowerCase())
-      )
-    }
-    if (severityFilter !== 'ALL') {
-      result = result.filter(a => a.severity_label === severityFilter)
-    }
-    setFiltered(result)
-  }, [alerts, search, severityFilter])
-
-  async function fetchAlerts() {
-    setRefreshing(true)
-    const { data, error } = await supabase
-      .from('alerts')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(50)
-    if (!error) setAlerts(data || [])
-    setLoading(false)
-    setRefreshing(false)
-  }
-
-  function severityBg(label: string) {
-    if (label === 'P1') return 'bg-red-500/10 text-red-400 border-red-500/20'
-    if (label === 'P2') return 'bg-orange-500/10 text-orange-400 border-orange-500/20'
-    return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-  }
-
-  function confidenceColor(c: string) {
-    if (c === 'high') return 'text-emerald-400'
-    if (c === 'medium') return 'text-yellow-400'
-    return 'text-red-400'
-  }
-
-  function timeAgo(date: string) {
-    const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000)
-    if (diff < 60) return `${diff}s ago`
-    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
-    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`
-    return `${Math.floor(diff / 86400)}d ago`
-  }
-
-  const p1count = alerts.filter(a => a.severity_label === 'P1').length
-  const deployCount = alerts.filter(a => a.deploy_correlated).length
-  const commitCount = alerts.filter(a => a.guilty_commit).length
+export default function Landing() {
+  const router = useRouter()
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white">
       {/* Navbar */}
       <nav className="border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
               <Zap size={16} className="text-white" />
             </div>
             <span className="font-bold text-lg tracking-tight">AlertMind</span>
-            <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Live</span>
           </div>
-          <a href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors mr-4">Pricing</a>
-          <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 cursor-pointer">
-              <UserButton />
-              <div>
-                <p className="text-xs font-medium text-white leading-none">{user?.firstName || user?.emailAddresses[0]?.emailAddress?.split('@')[0]}</p>
-                <p className="text-xs text-gray-500 leading-none mt-0.5">Click to manage</p>
-              </div>
-            </div>
-          <button
-            onClick={fetchAlerts}
-            className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
-          >
-            <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-            Refresh
-          </button>
+          <div className="flex items-center gap-4">
+            <a href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="bg-white text-black text-sm font-medium px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              Open Dashboard
+            </button>
+          </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white/3 border border-white/5 rounded-xl p-4">
-            <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Total Alerts</p>
-            <p className="text-3xl font-bold">{alerts.length}</p>
+      {/* Hero */}
+      <section className="max-w-6xl mx-auto px-6 pt-24 pb-16 text-center">
+        <div className="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-full px-4 py-1.5 text-red-400 text-sm mb-8">
+          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+          AI-powered on-call assistant
+        </div>
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+          Stop waking up at<br />
+          <span className="text-red-400">3 AM</span> confused.
+        </h1>
+        <p className="text-gray-400 text-xl mb-10 max-w-2xl mx-auto leading-relaxed">
+          AlertMind receives your server alerts, fetches real GitHub commit history,
+          identifies the guilty commit and author using AI, and posts a diagnosis
+          to Slack in under 60 seconds.
+        </p>
+        <div className="flex items-center justify-center gap-4 flex-wrap">
+          <button
+            onClick={() => router.push('/dashboard')}
+            className="flex items-center gap-2 bg-white text-black font-medium px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors"
+          >
+            Open Dashboard <ChevronRight size={16} />
+          </button>
+          
+            href="/pricing"
+            className="flex items-center gap-2 bg-white/5 border border-white/10 text-white font-medium px-6 py-3 rounded-xl hover:bg-white/10 transition-colors"
+          >
+            View Pricing
+          </a>
+        </div>
+      </section>
+
+      {/* Slack message demo */}
+      <section className="max-w-3xl mx-auto px-6 pb-20">
+        <div className="bg-[#1a1d21] rounded-2xl p-6 border border-white/5">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+              <Zap size={14} className="text-white" />
+            </div>
+            <span className="font-semibold">AlertMind</span>
+            <span className="text-gray-500 text-sm">3:44 AM</span>
           </div>
-          <div className="bg-red-500/5 border border-red-500/10 rounded-xl p-4">
-            <p className="text-red-400/70 text-xs uppercase tracking-wider mb-1">P1 Critical</p>
-            <p className="text-3xl font-bold text-red-400">{p1count}</p>
-          </div>
-          <div className="bg-orange-500/5 border border-orange-500/10 rounded-xl p-4">
-            <p className="text-orange-400/70 text-xs uppercase tracking-wider mb-1">Deploy Correlated</p>
-            <p className="text-3xl font-bold text-orange-400">{deployCount}</p>
-          </div>
-          <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
-            <p className="text-blue-400/70 text-xs uppercase tracking-wider mb-1">Commits Identified</p>
-            <p className="text-3xl font-bold text-blue-400">{commitCount}</p>
+          <div className="border-l-4 border-red-500 pl-4">
+            <p className="font-bold text-red-400 mb-1">🚨 P1 Alert — api-service (prod)</p>
+            <p className="text-gray-300 text-sm mb-3">CPU hit 94% at 3:44 AM</p>
+            <p className="text-gray-400 text-sm mb-1"><span className="text-white font-medium">Most likely cause:</span></p>
+            <p className="text-gray-300 text-sm mb-3">Commit <code className="bg-yellow-500/20 text-yellow-400 px-1.5 py-0.5 rounded">57040e2</code> by <strong>Talal</strong> removed a DB index on orders.user_id causing full table scans.</p>
+            <p className="text-gray-400 text-sm mb-1"><span className="text-white font-medium">Suggested fix:</span></p>
+            <code className="block bg-black/40 text-emerald-400 text-sm p-3 rounded-lg mb-4">
+              Revert deploy #247 and re-add the missing index on orders.user_id
+            </code>
+            <div className="flex gap-2">
+              <button className="bg-emerald-600 text-white text-xs px-3 py-1.5 rounded-lg">✅ Acknowledge</button>
+              <button className="bg-gray-700 text-white text-xs px-3 py-1.5 rounded-lg">🔇 Snooze 30min</button>
+              <button className="bg-red-600 text-white text-xs px-3 py-1.5 rounded-lg">✅ Resolve</button>
+            </div>
           </div>
         </div>
+      </section>
 
-        {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 mb-6">
-          <div className="relative flex-1">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
-            <input
-              type="text"
-              placeholder="Search by service or cause..."
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full bg-white/3 border border-white/5 rounded-lg pl-9 pr-4 py-2.5 text-sm text-gray-300 placeholder-gray-600 focus:outline-none focus:border-white/20"
-            />
-          </div>
-          <div className="flex gap-2">
-            {['ALL', 'P1', 'P2', 'P3'].map(s => (
-              <button
-                key={s}
-                onClick={() => setSeverityFilter(s)}
-                className={`px-4 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                  severityFilter === s
-                    ? 'bg-white text-black'
-                    : 'bg-white/3 border border-white/5 text-gray-400 hover:text-white'
-                }`}
-              >
-                {s}
-              </button>
-            ))}
+      {/* How it works */}
+      <section className="max-w-6xl mx-auto px-6 pb-20">
+        <h2 className="text-3xl font-bold text-center mb-4">How it works</h2>
+        <p className="text-gray-400 text-center mb-12">From alert to diagnosis in under 60 seconds</p>
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-center">
+          {[
+            { icon: Bell, label: "Alert fires", sub: "PagerDuty / OpsGenie" },
+            { icon: GitCommit, label: "Fetch commits", sub: "Real GitHub history" },
+            { icon: Zap, label: "AI analysis", sub: "LLM correlates cause" },
+            { icon: Shield, label: "Slack message", sub: "Diagnosis + fix" },
+            { icon: Check, label: "Engineer acts", sub: "In under 2 mins" },
+          ].map((step, i) => (
+            <div key={i} className="flex flex-col items-center text-center">
+              <div className="w-12 h-12 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center mb-3">
+                <step.icon size={20} className="text-white" />
+              </div>
+              <p className="font-medium text-sm">{step.label}</p>
+              <p className="text-gray-500 text-xs mt-1">{step.sub}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="max-w-6xl mx-auto px-6 pb-20">
+        <h2 className="text-3xl font-bold text-center mb-12">Everything you need</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { icon: GitCommit, title: "Guilty Commit Detection", desc: "Fetches real GitHub commit history and identifies the exact commit SHA and author that caused the alert." },
+            { icon: Bell, title: "Slack Interactive Buttons", desc: "Acknowledge, Snooze, or Resolve alerts directly in Slack. Message updates in place — no context switching." },
+            { icon: BarChart3, title: "Real-time Dashboard", desc: "Live alert feed with search, severity filters, confidence scoring, and deploy correlation tracking." },
+            { icon: Shield, title: "Duplicate Suppression", desc: "Smart 10-minute deduplication window prevents alert spam while still catching new incidents." },
+            { icon: Clock, title: "Slash Commands", desc: "Use /alertmind status and /alertmind history directly in Slack to query your alert history." },
+            { icon: Zap, title: "Multi-alert Support", desc: "Handles CPU, memory, latency, error rate alerts — each with AI-powered root cause analysis." },
+          ].map((f, i) => (
+            <div key={i} className="bg-white/3 border border-white/5 rounded-xl p-5 hover:border-white/10 transition-colors">
+              <div className="w-10 h-10 bg-white/5 rounded-lg flex items-center justify-center mb-4">
+                <f.icon size={18} className="text-white" />
+              </div>
+              <h3 className="font-semibold mb-2">{f.title}</h3>
+              <p className="text-gray-500 text-sm leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Tech stack */}
+      <section className="max-w-6xl mx-auto px-6 pb-20">
+        <h2 className="text-3xl font-bold text-center mb-4">Built with modern stack</h2>
+        <p className="text-gray-400 text-center mb-10">Production-grade infrastructure from day one</p>
+        <div className="flex flex-wrap justify-center gap-3">
+          {['Python', 'FastAPI', 'Next.js', 'PostgreSQL', 'Supabase', 'Slack SDK', 'GitHub API', 'Gemini AI', 'Stripe', 'Docker', 'GitHub Actions', 'Vercel', 'Clerk'].map(t => (
+            <span key={t} className="bg-white/5 border border-white/10 text-gray-300 text-sm px-4 py-2 rounded-full">
+              {t}
+            </span>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="max-w-6xl mx-auto px-6 pb-24 text-center">
+        <div className="bg-white/3 border border-white/5 rounded-2xl p-12">
+          <h2 className="text-4xl font-bold mb-4">Ready to sleep through the night?</h2>
+          <p className="text-gray-400 mb-8">Join engineering teams using AlertMind to cut MTTR from 20 minutes to under 2.</p>
+          <div className="flex items-center justify-center gap-4 flex-wrap">
+            <button
+              onClick={() => router.push('/pricing')}
+              className="bg-white text-black font-medium px-8 py-3 rounded-xl hover:bg-gray-100 transition-colors"
+            >
+              Get started
+            </button>
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="bg-white/5 border border-white/10 text-white font-medium px-8 py-3 rounded-xl hover:bg-white/10 transition-colors"
+            >
+              View live demo
+            </button>
           </div>
         </div>
+      </section>
 
-        {/* Alert List */}
-        {loading ? (
-          <div className="space-y-3">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white/3 border border-white/5 rounded-xl p-5 animate-pulse">
-                <div className="h-4 bg-white/5 rounded w-1/3 mb-3" />
-                <div className="h-3 bg-white/5 rounded w-2/3 mb-2" />
-                <div className="h-3 bg-white/5 rounded w-1/2" />
-              </div>
-            ))}
+      {/* Footer */}
+      <footer className="border-t border-white/5 py-8">
+        <div className="max-w-6xl mx-auto px-6 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-red-500 rounded flex items-center justify-center">
+              <Zap size={12} className="text-white" />
+            </div>
+            <span className="text-sm text-gray-400">AlertMind — Built by Hafiz Muhammad Talal</span>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-gray-600">
-            <AlertTriangle size={32} className="mx-auto mb-3 opacity-30" />
-            <p>No alerts found</p>
+          <div className="flex gap-6 text-sm text-gray-500">
+            <a href="/pricing" className="hover:text-white transition-colors">Pricing</a>
+            <a href="/dashboard" className="hover:text-white transition-colors">Dashboard</a>
+            <a href="https://github.com/talalhafizmuhammad/alertmind-backend" target="_blank" className="hover:text-white transition-colors">GitHub</a>
           </div>
-        ) : (
-          <div className="space-y-3">
-            {filtered.map(alert => (
-              <div key={alert.id} className="bg-white/3 border border-white/5 rounded-xl p-5 hover:border-white/10 transition-colors">
-                <div className="flex items-start justify-between gap-4 mb-3">
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <span className={`text-xs font-bold px-2.5 py-1 rounded-lg border ${severityBg(alert.severity_label)}`}>
-                      {alert.severity_label}
-                    </span>
-                    <span className="font-semibold text-white">{alert.service}</span>
-                    <span className="text-gray-500 text-sm">{alert.metric} · {alert.value}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-gray-600 text-xs shrink-0">
-                    <Clock size={11} />
-                    {timeAgo(alert.created_at)}
-                  </div>
-                </div>
-
-                <p className="text-gray-400 text-sm mb-3 leading-relaxed">{alert.most_likely_cause}</p>
-
-                {alert.guilty_commit && (
-                  <div className="flex items-center gap-2 mb-3">
-                    <GitCommit size={13} className="text-yellow-500" />
-                    <code className="text-yellow-400 text-xs bg-yellow-500/10 border border-yellow-500/20 px-2 py-0.5 rounded">
-                      {alert.guilty_commit}
-                    </code>
-                    <span className="text-gray-500 text-xs">by</span>
-                    <span className="text-gray-300 text-xs font-medium">{alert.guilty_author}</span>
-                  </div>
-                )}
-
-                <div className="bg-black/30 border border-white/5 rounded-lg p-3 mb-3">
-                  <p className="text-emerald-400 text-xs font-mono">{alert.suggested_fix}</p>
-                </div>
-
-                <div className="flex items-center gap-3 text-xs">
-                  <span className={`font-medium ${confidenceColor(alert.confidence)}`}>
-                    {alert.confidence?.toUpperCase()} confidence
-                  </span>
-                  {alert.deploy_correlated && (
-                    <span className="flex items-center gap-1 text-blue-400">
-                      <CheckCircle size={11} />
-                      Deploy correlated
-                    </span>
-                  )}
-                  {alert.deployer && (
-                    <span className="text-gray-600">{alert.deployer}</span>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      </footer>
     </main>
   )
 }
