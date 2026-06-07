@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search, Zap } from 'lucide-react'
+import { UserButton } from '@clerk/nextjs'
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -104,6 +105,7 @@ export default function Dashboard() {
             <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full">Live</span>
           </div>
           <a href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors mr-4">Pricing</a>
+          <UserButton afterSignOutUrl="/sign-in" />
           <button
             onClick={fetchAlerts}
             className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
