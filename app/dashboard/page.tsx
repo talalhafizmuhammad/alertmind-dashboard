@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search, Zap } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid } from 'recharts'
 
 
@@ -124,7 +124,7 @@ export default function Dashboard() {
   const commitCount = alerts.filter(a => a.guilty_commit).length
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="text-white">
       {/* Navbar */}
       <nav className="border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -137,13 +137,7 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-4">
             <a href="/pricing" className="text-sm text-gray-400 hover:text-white transition-colors">Pricing</a>
-            <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 cursor-pointer">
-              <UserButton />
-              <div>
-                <p className="text-xs font-medium text-white leading-none">{user?.firstName || user?.emailAddresses[0]?.emailAddress?.split('@')[0]}</p>
-                <p className="text-xs text-gray-500 leading-none mt-0.5">Click to manage</p>
-              </div>
-            </div>
+
             <button
               onClick={fetchAlerts}
               className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors"
