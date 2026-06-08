@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
 import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search, Zap } from 'lucide-react'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid } from 'recharts'
 import { UserButton, useUser } from '@clerk/nextjs'
 
 const supabase = createClient(
@@ -67,6 +68,36 @@ export default function Dashboard() {
     if (!error) setAlerts(data || [])
     setLoading(false)
     setRefreshing(false)
+  }
+
+  function getChartData(alerts: Alert[]) {
+    const days: Record<string, { date: string, P1: number, P2: number, P3: number }> = {}
+    const last7 = [...Array(7)].map((_, i) => {
+      const d = new Date()
+      d.setDate(d.getDate() - (6 - i))
+      return d.toISOString().split('T')[0]
+    })
+    last7.forEach(d => { days[d] = { date: d.slice(5), P1: 0, P2: 0, P3: 0 } })
+    alerts.forEach(a => {
+      const d = a.created_at.split('T')[0]
+      if (days[d]) {
+        const label = a.severity_label as 'P1' | 'P2' | 'P3'
+        if (label in days[d]) days[d][label]++
+      }
+    })
+    return Object.values(days)
+  }
+
+  function getServiceData(alerts: Alert[]) {
+    const services: Record<string, number> = {}
+    alerts.forEach(a => {
+      const name = a.service.replace(' (prod)', '')
+      services[name] = (services[name] || 0) + 1
+    })
+    return Object.entries(services)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([name, count]) => ({ name, count }))
   }
 
   function severityBg(label: string) {
@@ -143,6 +174,35 @@ export default function Dashboard() {
           <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
             <p className="text-blue-400/70 text-xs uppercase tracking-wider mb-1">Commits Identified</p>
             <p className="text-3xl font-bold text-blue-400">{commitCount}</p>
+          </div>
+        </div>
+
+        {/* Charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+          <div className="bg-white/3 border border-white/5 rounded-xl p-5">
+            <p className="text-sm text-gray-400 mb-4">Alerts over last 7 days</p>
+            <ResponsiveContainer width="100%" height={160}>
+              <LineChart data={getChartData(alerts)}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                <YAxis tick={{ fontSize: 11, fill: '#6b7280' }} />
+                <Tooltip contentStyle={{ background: '#111', border: '1px solid #ffffff10', borderRadius: 8 }} />
+                <Line type="monotone" dataKey="P1" stroke="#ef4444" strokeWidth={2} dot={false} />
+                <Line type="monotone" dataKey="P2" stroke="#f97316" strokeWidth={2} dot={false} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <div className="bg-white/3 border border-white/5 rounded-xl p-5">
+            <p className="text-sm text-gray-400 mb-4">Top services by alert count</p>
+            <ResponsiveContainer width="100%" height={160}>
+              <BarChart data={getServiceData(alerts)} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff08" />
+                <XAxis type="number" tick={{ fontSize: 11, fill: '#6b7280' }} />
+                <YAxis dataKey="name" type="category" tick={{ fontSize: 10, fill: '#6b7280' }} width={100} />
+                <Tooltip contentStyle={{ background: '#111', border: '1px solid #ffffff10', borderRadius: 8 }} />
+                <Bar dataKey="count" fill="#3b82f6" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
 
