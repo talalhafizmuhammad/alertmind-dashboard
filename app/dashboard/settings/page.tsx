@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useUser } from '@clerk/nextjs'
-import { Save, Copy, Check, Bell, Github, Slack, Webhook } from 'lucide-react'
+import { Save, Copy, Check, Bell, Webhook, Globe, MessageSquare } from 'lucide-react'
 
 export default function Settings() {
   const { user } = useUser()
@@ -89,7 +89,7 @@ export default function Settings() {
       {/* GitHub */}
       <div className="bg-white/3 border border-white/5 rounded-xl p-6 mb-6">
         <h2 className="font-semibold mb-1 flex items-center gap-2">
-          <Github size={16} />
+          <Globe size={16} />
           GitHub Integration
         </h2>
         <p className="text-gray-500 text-sm mb-4">Repository mapped for commit correlation</p>
@@ -140,7 +140,7 @@ export default function Settings() {
       {/* Slack */}
       <div className="bg-white/3 border border-white/5 rounded-xl p-6 mb-8">
         <h2 className="font-semibold mb-1 flex items-center gap-2">
-          <Slack size={16} />
+          <MessageSquare size={16} />
           Slack Integration
         </h2>
         <p className="text-gray-500 text-sm mb-4">Configure your Slack alert channel</p>
