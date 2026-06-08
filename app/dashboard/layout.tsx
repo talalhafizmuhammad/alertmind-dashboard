@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { Zap, LayoutDashboard, BarChart3, Clock, DollarSign, LogOut } from 'lucide-react'
+import { Zap, LayoutDashboard, BarChart3, Clock, DollarSign, Settings } from 'lucide-react'
 import { UserButton, useUser } from '@clerk/nextjs'
 
 const navItems = [
@@ -10,6 +10,7 @@ const navItems = [
   { icon: BarChart3, label: 'Analytics', href: '/dashboard/analytics' },
   { icon: Clock, label: 'History', href: '/dashboard/history' },
   { icon: DollarSign, label: 'Pricing', href: '/pricing' },
+  { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
