@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react'
 import { createClient } from '@supabase/supabase-js'
-import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search, Zap } from 'lucide-react'
+import { AlertTriangle, CheckCircle, Clock, GitCommit, RefreshCw, Search } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, CartesianGrid } from 'recharts'
-import { UserButton, useUser } from '@clerk/nextjs'
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,7 +30,6 @@ interface Alert {
 }
 
 export default function Dashboard() {
-  const { user } = useUser()
   const [alerts, setAlerts] = useState<Alert[]>([])
   const [filtered, setFiltered] = useState<Alert[]>([])
   const [loading, setLoading] = useState(true)
@@ -125,7 +124,7 @@ export default function Dashboard() {
   const commitCount = alerts.filter(a => a.guilty_commit).length
 
   return (
-    <main className="min-h-screen bg-[#0a0a0f] text-white">
+    <div className="min-h-screen bg-[#0a0a0f] text-white">
       {/* Navbar */}
       <nav className="border-b border-white/5 bg-[#0a0a0f]/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -156,7 +155,7 @@ export default function Dashboard() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="px-6 py-8">
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white/3 border border-white/5 rounded-xl p-4">
@@ -305,6 +304,6 @@ export default function Dashboard() {
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }
