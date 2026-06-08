@@ -26,6 +26,9 @@ interface Alert {
   guilty_commit: string
   guilty_author: string
   created_at: string
+  mttr_minutes: number
+  resolved_by: string
+  resolved_at: string
 }
 
 export default function Dashboard() {
@@ -121,6 +124,10 @@ export default function Dashboard() {
   const p1count = alerts.filter(a => a.severity_label === 'P1').length
   const deployCount = alerts.filter(a => a.deploy_correlated).length
   const commitCount = alerts.filter(a => a.guilty_commit).length
+  const resolvedAlerts = alerts.filter(a => a.mttr_minutes)
+  const avgMTTR = resolvedAlerts.length
+    ? Math.round(resolvedAlerts.reduce((sum, a) => sum + a.mttr_minutes, 0) / resolvedAlerts.length)
+    : null
 
   return (
     <div className="text-white px-6 py-8">
@@ -156,6 +163,10 @@ export default function Dashboard() {
         <div className="bg-blue-500/5 border border-blue-500/10 rounded-xl p-4">
           <p className="text-blue-400/70 text-xs uppercase tracking-wider mb-1">Commits Identified</p>
           <p className="text-3xl font-bold text-blue-400">{commitCount}</p>
+        </div>
+        <div className="bg-emerald-500/5 border border-emerald-500/10 rounded-xl p-4">
+          <p className="text-emerald-400/70 text-xs uppercase tracking-wider mb-1">Avg MTTR</p>
+          <p className="text-3xl font-bold text-emerald-400">{avgMTTR ? `${avgMTTR}m` : '—'}</p>
         </div>
       </div>
 

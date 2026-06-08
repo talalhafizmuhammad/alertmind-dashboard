@@ -74,6 +74,10 @@ export default function Analytics() {
   const deployCount = alerts.filter(a => a.deploy_correlated).length
   const commitCount = alerts.filter(a => a.guilty_commit).length
   const highConfidence = alerts.filter(a => a.confidence === 'high').length
+  const resolved = alerts.filter(a => a.mttr_minutes)
+  const avgMTTR = resolved.length
+    ? Math.round(resolved.reduce((sum: number, a: any) => sum + a.mttr_minutes, 0) / resolved.length)
+    : 0
 
   return (
     <div className="px-6 py-8">
@@ -89,6 +93,7 @@ export default function Analytics() {
           { label: 'P1 Critical', value: p1Count, color: 'text-red-400' },
           { label: 'Deploy Correlated', value: `${deployCount}`, color: 'text-orange-400' },
           { label: 'High Confidence', value: `${highConfidence}`, color: 'text-emerald-400' },
+          { label: 'Avg MTTR', value: avgMTTR ? `${avgMTTR}m` : '—', color: 'text-purple-400' },
         ].map((s, i) => (
           <div key={i} className="bg-white/3 border border-white/5 rounded-xl p-4">
             <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">{s.label}</p>
