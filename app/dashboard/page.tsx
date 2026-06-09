@@ -29,6 +29,7 @@ interface Alert {
   mttr_minutes: number
   resolved_by: string
   resolved_at: string
+  runbook: any[]
 }
 
 export default function Dashboard() {
@@ -275,6 +276,24 @@ export default function Dashboard() {
               <div className="bg-black/30 border border-white/5 rounded-lg p-3 mb-3">
                 <p className="text-emerald-400 text-xs font-mono">{alert.suggested_fix}</p>
               </div>
+              {alert.runbook && alert.runbook.length > 0 && (
+                <div className="mb-3">
+                  <p className="text-xs text-gray-500 mb-2">📋 Runbook</p>
+                  <div className="space-y-1.5">
+                    {alert.runbook.map((step: any) => (
+                      <div key={step.step} className="flex gap-2 text-xs">
+                        <span className="text-gray-600 shrink-0">{step.step}.</span>
+                        <div>
+                          <span className="text-gray-300">{step.action}</span>
+                          {step.command && step.command !== "null" && (
+                            <code className="block mt-0.5 text-emerald-400 bg-black/30 px-2 py-0.5 rounded font-mono">{step.command}</code>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="flex items-center gap-3 text-xs">
                 <span className={`font-medium ${confidenceColor(alert.confidence)}`}>
                   {alert.confidence?.toUpperCase()} confidence
