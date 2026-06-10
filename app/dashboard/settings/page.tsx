@@ -155,6 +155,30 @@ export default function Settings() {
         </div>
       </div>
 
+      {/* Repo Mappings */}
+      <div className="bg-white/3 border border-white/5 rounded-xl p-6 mb-8">
+        <h2 className="font-semibold mb-1 flex items-center gap-2">
+          <Globe size={16} />
+          GitHub Repo Mappings
+        </h2>
+        <p className="text-gray-500 text-sm mb-4">Map each service to its GitHub repository for commit correlation</p>
+        <div className="space-y-2 mb-4">
+          {[
+            { service: 'api-service (prod)', repo: 'alertmind' },
+            { service: 'auth-service (prod)', repo: 'alertmind' },
+            { service: 'payment-service (prod)', repo: 'alertmind' },
+            { service: 'checkout-service (prod)', repo: 'alertmind' },
+          ].map((m, i) => (
+            <div key={i} className="flex items-center gap-3">
+              <code className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300">{m.service}</code>
+              <span className="text-gray-600">→</span>
+              <code className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-emerald-400">{m.repo}</code>
+            </div>
+          ))}
+        </div>
+        <p className="text-xs text-gray-600">To add mappings, update the REPO_MAP in github_context.py</p>
+      </div>
+
       <button
         onClick={saveSettings}
         className="flex items-center gap-2 bg-white text-black font-medium px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors"
