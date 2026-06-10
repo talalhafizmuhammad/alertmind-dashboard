@@ -8,6 +8,12 @@ export default function Settings() {
   const { user } = useUser()
   const [copied, setCopied] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [repoMappings, setRepoMappings] = useState([
+    { service: 'api-service (prod)', repo: 'alertmind' },
+    { service: 'auth-service (prod)', repo: 'alertmind' },
+    { service: 'payment-service (prod)', repo: 'alertmind' },
+    { service: 'checkout-service (prod)', repo: 'alertmind' },
+  ])
   const [settings, setSettings] = useState({
     notifyP1Only: true,
     notifyOnResolve: false,
@@ -163,20 +169,44 @@ export default function Settings() {
         </h2>
         <p className="text-gray-500 text-sm mb-4">Map each service to its GitHub repository for commit correlation</p>
         <div className="space-y-2 mb-4">
-          {[
-            { service: 'api-service (prod)', repo: 'alertmind' },
-            { service: 'auth-service (prod)', repo: 'alertmind' },
-            { service: 'payment-service (prod)', repo: 'alertmind' },
-            { service: 'checkout-service (prod)', repo: 'alertmind' },
-          ].map((m, i) => (
+          {repoMappings.map((m, i) => (
             <div key={i} className="flex items-center gap-3">
-              <code className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300">{m.service}</code>
+              <input
+                type="text"
+                value={m.service}
+                onChange={e => {
+                  const updated = [...repoMappings]
+                  updated[i].service = e.target.value
+                  setRepoMappings(updated)
+                }}
+                className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-gray-300 focus:outline-none focus:border-white/20"
+                placeholder="service name"
+              />
               <span className="text-gray-600">→</span>
-              <code className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-emerald-400">{m.repo}</code>
+              <input
+                type="text"
+                value={m.repo}
+                onChange={e => {
+                  const updated = [...repoMappings]
+                  updated[i].repo = e.target.value
+                  setRepoMappings(updated)
+                }}
+                className="flex-1 bg-black/40 border border-white/5 rounded-lg px-3 py-2 text-xs text-emerald-400 focus:outline-none focus:border-white/20"
+                placeholder="repo name"
+              />
+              <button
+                onClick={() => setRepoMappings(repoMappings.filter((_, j) => j !== i))}
+                className="text-red-400 hover:text-red-300 text-xs px-2"
+              >✕</button>
             </div>
           ))}
         </div>
-        <p className="text-xs text-gray-600">To add mappings, update the REPO_MAP in github_context.py</p>
+        <button
+          onClick={() => setRepoMappings([...repoMappings, { service: '', repo: '' }])}
+          className="text-xs text-gray-400 hover:text-white border border-white/10 px-3 py-1.5 rounded-lg transition-colors"
+        >
+          + Add mapping
+        </button>
       </div>
 
       <button
